@@ -1,0 +1,31 @@
+{"name": "oregon-trip-ready-api",
+  "version": "1.0.0",
+  "description": "API server for Oregon weather, air-quality, road-advisory, and trip-summary data.",
+  "main": "index.js",
+  "type": "module",
+ "scripts": {
+  "start": "node server.js",
+  "dev": "nodemon server.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AGiv-lab/oregon-trip-ready-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AGiv-lab/oregon-trip-ready-api/issues"
+  },
+  "homepage": "https://github.com/AGiv-lab/oregon-trip-ready-api#readme",
+  "dependencies": {
+    "axios": "^1.18.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.8.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
