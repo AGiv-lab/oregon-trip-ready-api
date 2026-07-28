@@ -185,3 +185,163 @@ The `.env` file will remain listed in `.gitignore`. An `.env.example` file may d
 ## Limitations and Disclaimer
 
 Oregon Trip Ready provides information for planning convenience only. Conditions can change rapidly, and information from third-party services may be delayed or unavailable. Users should verify important information through official agencies and follow all emergency instructions.
+
+## Domain Model
+
+Oregon Trip Ready does not store user data. Its domain model represents the temporary data created when a user searches for an Oregon destination.
+
+A search query is converted into a location. That location is used to request current weather and air-quality information. The results are combined into a single conditions result and displayed to the user.
+
+### Domain Entities
+
+#### Search Query
+
+Represents the destination entered by the user.
+
+| Property | Data Type | Description |
+|---|---|---|
+| `destination` | String | Oregon destination entered by the user |
+
+#### Location
+
+Represents the geographic location returned by the geocoding service.
+
+| Property | Data Type | Description |
+|---|---|---|
+| `name` | String | Destination name |
+| `stateCode` | String | State abbreviation, such as `OR` |
+| `countryCode` | String | Country abbreviation, such as `US` |
+| `latitude` | Number | Geographic latitude |
+| `longitude` | Number | Geographic longitude |
+
+#### Weather Conditions
+
+Represents current weather returned by OpenWeather.
+
+| Property | Data Type | Description |
+|---|---|---|
+| `temperature` | Number | Current temperature |
+| `description` | String | Short description of current conditions |
+| `windSpeed` | Number | Current wind speed |
+| `precipitation` | Number | Available precipitation measurement |
+| `iconCode` | String | OpenWeather condition icon identifier |
+
+#### Air Quality
+
+Represents current air-quality information returned by AirNow.
+
+| Property | Data Type | Description |
+|---|---|---|
+| `aqi` | Number | Current U.S. Air Quality Index value |
+| `category` | String | AQI category, such as Good or Moderate |
+| `pollutant` | String | Pollutant associated with the reported AQI |
+| `reportingArea` | String | AirNow reporting area |
+| `observationTime` | String | Time of the reported observation |
+
+#### Conditions Result
+
+Represents the combined response returned to the frontend.
+
+| Property | Data Type | Description |
+|---|---|---|
+| `location` | Location | Geocoded destination information |
+| `weather` | WeatherConditions | Current weather result |
+| `airQuality` | AirQuality | Current air-quality result |
+
+#### External Resource
+
+Represents an official external resource displayed as a stretch-goal link.
+
+| Property | Data Type | Description |
+|---|---|---|
+| `name` | String | Name of the external resource |
+| `url` | String | Official website address |
+| `category` | String | Resource type, such as fire, road or seismic |
+| `iconName` | String | React Icons identifier |
+
+### Domain Relationships
+
+- One `SearchQuery` resolves to one `Location`.
+- One `Location` is used to request one current `WeatherConditions` result.
+- One `Location` is used to request zero or one current `AirQuality` result.
+- One `ConditionsResult` contains one `Location`, one `WeatherConditions` result and zero or one `AirQuality` result.
+- The application may display multiple `ExternalResource` links.
+- None of these entities are saved after the search session.
+
+### UML Domain Model
+
+```mermaid
+classDiagram
+    class SearchQuery {
+        +String destination
+    }
+
+    class Location {
+        +String name
+        +String stateCode
+        +String countryCode
+        +Number latitude
+        +Number longitude
+    }
+
+    class WeatherConditions {
+        +Number temperature
+        +String description
+        +Number windSpeed
+        +Number precipitation
+        +String iconCode
+    }
+
+    class AirQuality {
+        +Number aqi
+        +String category
+        +String pollutant
+        +String reportingArea
+        +String observationTime
+    }
+
+    class ConditionsResult {
+        +Location location
+        +WeatherConditions weather
+        +AirQuality airQuality
+    }
+
+    class ExternalResource {
+        +String name
+        +String url
+        +String category
+        +String iconName
+    }
+
+    SearchQuery --> Location : resolves to
+    Location --> WeatherConditions : requests
+    Location --> AirQuality : requests
+    ConditionsResult *-- Location : contains
+    ConditionsResult *-- WeatherConditions : contains
+    ConditionsResult *-- AirQuality : may contain
+```
+
+### Function Relationships
+
+
+
+```mermaid
+flowchart TD
+    A["handleSearch()"] --> B["getCoordinates()"]
+    B --> C["getWeather()"]
+    B --> D["getAirQuality()"]
+    C --> E["buildConditionsResult()"]
+    D --> E
+    E --> F["updateState()"]
+    F --> G["render condition panels"]
+```
+
+| Function | Input | Output | Responsibility |
+|---|---|---|---|
+| `handleSearch()` | Search form event | None | Captures and submits the search query |
+| `getCoordinates()` | Destination string | Location object | Converts the destination into coordinates |
+| `getWeather()` | Latitude and longitude | WeatherConditions object | Retrieves current weather |
+| `getAirQuality()` | Latitude and longitude | AirQuality object or `null` | Retrieves current AQI when available |
+| `buildConditionsResult()` | Location, weather and AQI | ConditionsResult object | Organizes the API results |
+| `updateState()` | ConditionsResult object | Updated React state | Causes the result panels to render |
+
