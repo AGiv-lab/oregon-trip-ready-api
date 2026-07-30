@@ -1,7 +1,7 @@
 {"name": "oregon-trip-ready-api",
   "version": "1.0.0",
   "description": "API server for Oregon weather, air-quality, road-advisory, and trip-summary data.",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
  "scripts": {
   "start": "node server.js",
