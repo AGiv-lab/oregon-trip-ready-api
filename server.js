@@ -15,6 +15,16 @@ app.get('/', (request, response) => {
   response.send('Oregon Trip Ready API is running!');
 });
 
+app.get('/conditions', (request, response) => {
+  const destination = request.query.destination;
+
+  if (typeof destination !== 'string' || destination.trim() === '') {
+    return response.status(400).json({ error: 'Destination is required.' });
+  }
+
+  return response.status(200).json({ destination: destination.trim() });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
