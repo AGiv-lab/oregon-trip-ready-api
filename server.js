@@ -43,12 +43,34 @@ app.get('/conditions', async (request, response) => {
       });
     }
 
+    const weatherResponse = await axios.get(
+      'https://api.openweathermap.org/data/2.5/weather',
+      {
+        params: {
+          lat: location.lat,
+          lon: location.lon,
+          appid: process.env.OPENWEATHER_API_KEY,
+          units: 'imperial'
+        }
+      }
+    );
+
+    const currentWeather = weatherResponse.data;
+
     return response.status(200).json({
       destination: location.name,
       state: location.state,
       country: location.country,
       latitude: location.lat,
-      longitude: location.lon
+      longitude: location.lon,
+      weather: {
+        temperature: currentWeather.main.temp,
+        feelsLike: currentWeather.main.feels_like,
+        humidity: currentWeather.main.humidity,
+        condition: currentWeather.weather[0].main,
+        description: currentWeather.weather[0].description,
+        windSpeed: currentWeather.wind.speed
+      }
     });
   } catch (error) {
     return response.status(500).json({
