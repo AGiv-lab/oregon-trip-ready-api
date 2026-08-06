@@ -75,6 +75,16 @@ The API returns standard HTTP status codes for common error conditions.
 - OpenWeather Current Weather API
 - Nodemon (development)
 
+## Local Setup
+
+1. Clone the repository.
+
+2. Install dependencies:
+
+```bash
+npm install
+```
+
 ## Future Improvements
 
 Potential enhancements for future releases include:
